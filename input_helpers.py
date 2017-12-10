@@ -67,16 +67,20 @@ class InputHelper(object):
         y=[]
         # positive samples from file
         for line in open(filepath):
-            l=line.strip().split("\t")
-            if len(l)<2:
-                continue
-            if random() > 0.5:
-                x1.append(l[0].lower())
-                x2.append(l[1].lower())
-            else:
-                x1.append(l[1].lower())
-                x2.append(l[0].lower())
-            y.append(int(l[2]))
+            try:
+                l=line.strip().split("||")
+                if len(l)<2:
+                    continue
+                if random() > 0.5:
+                    x1.append(l[3][1:-1].lower())
+                    x2.append(l[4][1:-1].lower())
+                else:
+                    x1.append(l[4][1:-1].lower())
+                    x2.append(l[3][1:-1].lower())
+                y.append(int(l[5][1:-1]))
+            except:
+		print "Pair skipped"
+        print x1, x2, y
         return np.asarray(x1),np.asarray(x2),np.asarray(y)
 
     def getTsvDataCharBased(self, filepath):
@@ -201,10 +205,22 @@ class InputHelper(object):
         dev_set=(x1_dev,x2_dev,y_dev)
         gc.collect()
         return train_set,dev_set,vocab_processor,sum_no_of_batches
-    
+    def getTestDataExample(self, q1, q2, vocab_path, max_document_length): 
+        x1_temp,x2_temp,y = [q1.lower()],[q2.lower()],[1]
+        # Build vocabulary
+        vocab_processor = MyVocabularyProcessor(max_document_length,min_frequency=0)
+        vocab_processor = vocab_processor.restore(vocab_path)
+        print len(vocab_processor.vocabulary_)
+
+        x1 = np.asarray(list(vocab_processor.transform(x1_temp)))
+        x2 = np.asarray(list(vocab_processor.transform(x2_temp)))
+        # Randomly shuffle data
+        del vocab_processor
+        gc.collect()
+        return x1,x2, y
+
     def getTestDataSet(self, data_path, vocab_path, max_document_length):
         x1_temp,x2_temp,y = self.getTsvTestData(data_path)
-
         # Build vocabulary
         vocab_processor = MyVocabularyProcessor(max_document_length,min_frequency=0)
         vocab_processor = vocab_processor.restore(vocab_path)

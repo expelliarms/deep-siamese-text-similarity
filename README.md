@@ -70,57 +70,30 @@ Categories of pairs, it can learn as similar:
 - gensim 1.0.1
 - nltk 3.2.2
 
+# Preprocessing
+- Download dataset from https://www.kaggle.com/c/quora-question-pairs/data
+- Extract the train.csv to Data/train.csv
+- Replace comma delimiters to || by running the command
+```
+$ sed -i 's/\",\"/\"||\"/g' Data/train.csv
+```
+- Get embeddings from http://nlp.stanford.edu/data/wordvecs/glove.twitter.27B.zip
+- Extract and save it in embeddings/ directory
+
 # How to run
 ### Training
 ```
-$ python train.py [options/defaults]
-
-options:
-  -h, --help            show this help message and exit
-  --is_char_based IS_CHAR_BASED
-  			is character based syntactic similarity to be used for phrases.
-			if false then word embedding based semantic similarity is used.
-			(default: True)
-  --word2vec_model WORD2VEC_MODEL
-    			this flag will be used only if IS_CHAR_BASED is False
-  			word2vec pre-trained embeddings file (default: wiki.simple.vec)
-  --word2vec_format WORD2VEC_FORMAT
-  			this flag will be used only if IS_CHAR_BASED is False
-  			word2vec pre-trained embeddings file format (bin/text/textgz)(default: text)
-  --embedding_dim EMBEDDING_DIM
-                        Dimensionality of character embedding (default: 100)
-  --dropout_keep_prob DROPOUT_KEEP_PROB
-                        Dropout keep probability (default: 0.5)
-  --l2_reg_lambda L2_REG_LAMBDA
-                        L2 regularizaion lambda (default: 0.0)
-  --max_document_words MAX_DOCUMENT_WORDS
-                        Max length (left to right max words to consider) in
-                        every doc, else pad 0 (default: 100)
-  --training_files TRAINING_FILES
-                        Comma-separated list of training files (each file is
-                        tab separated format) (default: None)
-  --hidden_units HIDDEN_UNITS
-                        Number of hidden units(default:50)
-  --batch_size BATCH_SIZE
-                        Batch Size (default: 128)
-  --num_epochs NUM_EPOCHS
-                        Number of training epochs (default: 200)
-  --evaluate_every EVALUATE_EVERY
-                        Evaluate model on dev set after this many steps
-                        (default: 2000)
-  --checkpoint_every CHECKPOINT_EVERY
-                        Save model after this many steps (default: 2000)
-  --allow_soft_placement [ALLOW_SOFT_PLACEMENT]
-                        Allow device soft device placement
-  --noallow_soft_placement
-  --log_device_placement [LOG_DEVICE_PLACEMENT]
-                        Log placement of ops on devices
-  --nolog_device_placement
-
+$ python train.py --is_char_based=False --word2vec_model=embeddings/glove.twitter.27B.200d.txt --embedding_dim=200 --training_files=Data/train.csv
 ```
-### Evaluation
+
+### Evaluation on validation set
 ```
-$ python eval.py --model graph#.pb
+$ python eval.py --checkpoint_dir=runs/<run_id>/checkpoints/ --vocab_filepath=runs/<run_id>/checkpoints/vocab --model=runs/<run_id>/checkpoints/model-<iter>
+```
+
+### Evaluation on command line
+```
+$ python test_eval.py --checkpoint_dir=runs/<run_id>/checkpoints/ --vocab_filepath=runs/<run_id>/checkpoints/vocab --model=runs/<run_id>/checkpoints/model-<iter> --q1="Question 1?" --q2="Question 2?"
 ```
 
 # Performance
@@ -139,3 +112,4 @@ $ python eval.py --model graph#.pb
 # References
 1. [Learning Text Similarity with Siamese Recurrent Networks](http://www.aclweb.org/anthology/W16-16#page=162)
 2. [Siamese Recurrent Architectures for Learning Sentence Similarity](http://www.mit.edu/~jonasm/info/MuellerThyagarajan_AAAI16.pdf)
+

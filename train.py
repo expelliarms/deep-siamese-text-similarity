@@ -31,7 +31,7 @@ tf.flags.DEFINE_integer("hidden_units", 50, "Number of hidden units (default:50)
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer("num_epochs", 300, "Number of training epochs (default: 200)")
+tf.flags.DEFINE_integer("num_epochs", 3000, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 1000, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 1000, "Save model after this many steps (default: 100)")
 # Misc Parameters
@@ -139,7 +139,7 @@ with tf.Graph().as_default():
     checkpoint_prefix = os.path.join(checkpoint_dir, "model")
     if not os.path.exists(checkpoint_dir):
         os.makedirs(checkpoint_dir)
-    saver = tf.train.Saver(tf.global_variables(), max_to_keep=100)
+    saver = tf.train.Saver(tf.global_variables(), max_to_keep=10000)
 
     # Write vocabulary
     vocab_processor.save(os.path.join(checkpoint_dir, "vocab"))
